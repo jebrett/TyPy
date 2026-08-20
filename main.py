@@ -17,6 +17,45 @@ import plotly.express as px
 import plotly.graph_objects as go
 from skimage import measure
 
+def find_line_ellipsoid_intersections(p0, v, ellipsoid):
+    """
+    Finds the exact intersection points of a line and a rotated ellipsoid.
+    Line: P(t) = p0 + t * v
+    """
+
+    center = ellipsoid['center'].flatten()
+    axes = np.diag(ellipsoid['diagonal'])
+    R = ellipsoid['basis']
+    # 1. Transform line base point and direction vector to ellipsoid's local frame
+    p0_local = (p0 - center) @ R
+    v_local = v @ R
+
+    
+    
+    # 2. Set up the quadratic equation coefficients: A*t^2 + B*t + C = 0
+    # Equation: (p0_local.x + t*v_local.x)^2 / a^2 + ... = 1
+    inv_axes_sq = 1.0 / (axes ** 2)
+    
+    A = np.sum((v_local ** 2) * inv_axes_sq)
+    B = 2.0 * np.sum(p0_local * v_local * inv_axes_sq)
+    C = np.sum((p0_local ** 2) * inv_axes_sq) - 1.0
+    
+    # 3. Solve the quadratic discriminant
+    discriminant = B**2 - 4*A*C
+    
+    if discriminant < 0:
+        return [] # The line misses the ellipsoid entirely
+        
+    elif discriminant == 0:
+        t = -B / (2*A)
+        return [p0 + t * v] # Line is perfectly tangent (1 point)
+        
+    else:
+        # Two intersection points (entry and exit)
+        t1 = (-B - np.sqrt(discriminant)) / (2*A)
+        t2 = (-B + np.sqrt(discriminant)) / (2*A)
+        return [p0 + t1 * v, p0 + t2 * v]
+
 def check_inside_ellipsoid(pts, ellipsoid):
     """
     Evaluates whether coordinates fall inside an arbitrary ellipsoid.
@@ -202,15 +241,15 @@ def plot_ellipsoid(theta_rotate, phi_rotate, axes_lengths, mesh_color, fig, cent
         colorscale=[[0, mesh_color], [1, mesh_color]],
         opacity=0.3,
         showscale=False,
-        #contours=dict(
-        #x=dict(show=True, color=mesh_color, width=10),
-        #y=dict(show=True, color=mesh_color, width=10),
-        #z=dict(show=True, color=mesh_color, width=10)
-        #)
+        contours=dict(
+        x=dict(show=True, color='black', width=16),
+        y=dict(show=True, color='black', width=16),
+        z=dict(show=True, color='black', width=16)
+        )
     ))
     
     # Trace 2: The center point of the ellipsoid
-    fig.add_trace(go.Scatter3d(
+    '''fig.add_trace(go.Scatter3d(
         x=vec_center[0], 
         y=vec_center[1], 
         z=vec_center[2],
@@ -219,7 +258,7 @@ def plot_ellipsoid(theta_rotate, phi_rotate, axes_lengths, mesh_color, fig, cent
         name='Center',
         text=["Center"],
         textposition="top center"
-    ))
+    ))'''
 
     # Trace 3: Line from origin to ellipsoid center
     #fig.add_trace(go.Scatter3d(
@@ -254,18 +293,67 @@ fig.add_trace(go.Scatter3d(
         textposition="top center"
     ))
 
-associative_reg = plot_ellipsoid(45, 45, [5, 1.5, 1.5], 'red', fig, rho=5, positioning='vector')
-segregative_reg = plot_ellipsoid(45, 45, [0.5, 3, 3], 'blue', fig, rho=7, positioning='vector')
+associative_reg = plot_ellipsoid(45, 15, [3, 1.5, 1.5], 'red', fig, rho=5, positioning='vector')
+segregative_reg = plot_ellipsoid(45, 15, [0.5, 1.75, 1.75], 'blue', fig, rho=7.75, positioning='vector')
 
 ellipsoid_intersect(associative_reg, segregative_reg, fig, mesh_color='green')
 
+point1 = np.array([[1.5], [1.5], [0.6]])
+
+fig.add_trace(go.Scatter3d(
+        x=point1[0], 
+        y=point1[1], 
+        z=point1[2],
+        mode='markers+text',
+        marker=dict(size=1, color='black', symbol='circle'),
+        name='Input',
+        text=["Input"],
+        textposition="top center"
+    ))
+
+if check_inside_ellipsoid(point1.T, associative_reg):
+    
+    tie_vec = point1/np.linalg.norm(point1)
+    intersection_points = find_line_ellipsoid_intersections(point1.flatten(), tie_vec.flatten(), associative_reg)
+    
+    fig.add_trace(go.Scatter3d(
+        x=[intersection_points[0][0],
+        intersection_points[1][0]],
+        y=[intersection_points[0][1],
+        intersection_points[1][1]],
+        z=[intersection_points[0][2],
+        intersection_points[1][2]],
+        mode='lines',
+        line=dict(color='cyan', width=8),
+        name=f'associative intersection'
+    ))
+
+point2 = np.array([[intersection_points[1][0]], [intersection_points[1][1]], [intersection_points[1][2]]])
+print(point2)
+if check_inside_ellipsoid(point2.T, segregative_reg):
+    print('yup)')
+    tie_vec = np.array([0.3, 0.3, -1])
+    tie_vec = tie_vec/np.linalg.norm(tie_vec)
+    intersection_points2 = find_line_ellipsoid_intersections(point2.flatten(), tie_vec.flatten(), segregative_reg)
+    fig.add_trace(go.Scatter3d(
+            x=[intersection_points2[0][0],
+            intersection_points2[1][0]],
+            y=[intersection_points2[0][1],
+            intersection_points2[1][1]],
+            z=[intersection_points2[0][2],
+            intersection_points2[1][2]],
+            mode='lines',
+            line=dict(color='magenta', width=8),
+            name=f'segregative intersection'
+        ))
+    
 # Configure scene options and maintain forced 1:1:1 aspect ratio scaling
 fig.update_layout(
     title=f"Interactive Ellipsoid Matrix Transformation",
     scene=dict(
-        xaxis_title='X Axis',
-        yaxis_title='Y Axis',
-        zaxis_title='Z Axis',
+        xaxis_title='Unmodified Chromatin',
+        yaxis_title='H3K9me3 Chromatin',
+        zaxis_title='Hp1alpha',
         aspectmode='data' # Keeps the 3D aspect ratio proportional
     ),
     margin=dict(l=0, r=0, b=0, t=40)
