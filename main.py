@@ -32,6 +32,21 @@ REGION_COLOR_IDS = {
     f"{key}-color": (index, key)
     for index, (key, _, _) in enumerate(REGIONS)
 }
+COLOR_OPTIONS = [
+    {"label": f"{name} ({value})", "value": value}
+    for name, value in (
+        ("Green", "#2ca02c"),
+        ("Red", "#d62728"),
+        ("Blue", "#1f77b4"),
+        ("Cyan", "#17becf"),
+        ("Orange", "#ff7f0e"),
+        ("Purple", "#9467bd"),
+        ("Pink", "#e377c2"),
+        ("Brown", "#8c564b"),
+        ("Gold", "#bcbd22"),
+        ("Gray", "#7f7f7f"),
+    )
+]
 
 
 def slider(label: str, identifier: str, minimum: float, maximum: float, value: float, step: float = 1.0):
@@ -67,7 +82,13 @@ def color_control(label: str, identifier: str, value: str):
     return html.Div(
         [
             html.Label(label, htmlFor=identifier),
-            dcc.Input(id=identifier, type="color", value=value),
+            dcc.Dropdown(
+                id=identifier,
+                options=COLOR_OPTIONS,
+                value=value,
+                clearable=False,
+                searchable=False,
+            ),
         ],
         className="color-control",
     )

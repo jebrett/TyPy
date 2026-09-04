@@ -8,6 +8,7 @@ from main import (
     FAMILY_SIZE,
     REGION_COLOR_IDS,
     app,
+    color_control,
     region_color_patch,
     region_visibility_patch,
     selected_simplex_patch,
@@ -198,6 +199,13 @@ class AppCallbackTests(unittest.TestCase):
             [group.children[0].children for group in groups],
             ["Ellipsoid controls", "Region appearance", "Simplex controls"],
         )
+
+    def test_color_picker_uses_supported_dropdown(self):
+        picker = color_control("Region", "region-color", "#2ca02c").children[1]
+
+        self.assertEqual(picker._namespace, "dash_core_components")
+        self.assertFalse(picker.clearable)
+        self.assertGreaterEqual(len(picker.options), 10)
 
 
 if __name__ == "__main__":
