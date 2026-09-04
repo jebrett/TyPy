@@ -92,23 +92,17 @@ main {
 }
 
 .color-control {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 3rem;
-  align-items: center;
-  gap: 0.75rem;
+  display: block;
 }
 
 .color-control label {
+  display: block;
+  margin-bottom: 0.25rem;
   font-size: 0.82rem;
 }
 
-.color-control input {
-  width: 3rem;
-  height: 2rem;
-  padding: 0.1rem;
-  border: 1px solid #c6ceda;
-  border-radius: 4px;
-  background: white;
+.color-control .Select-control {
+  font-size: 0.82rem;
 }
 
 .viewer {

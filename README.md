@@ -25,7 +25,7 @@ Open the local URL printed by Dash, normally <http://127.0.0.1:8050>.
 - **Alpha window (z1, z2):** Main-vertex z interval over which the simplex opening follows a sine curve.
 - **Maximum alpha:** Peak azimuth offset of each leg, constrained below 90 degrees.
 - **Main-vertex z:** Browses the reachable simplex family and highlights the nearest member in orange. Its range updates to the monotonic branch of reachable entry vertices anchored at the chosen initial theta, so each z identifies one simplex.
-- **Phase regions:** Four checkboxes independently show or hide the green, red, blue-left, and blue-right region meshes. Each region also has a color picker initialized to the default color.
+- **Phase regions:** Four checkboxes independently show or hide the green, red, blue-left, and blue-right region meshes. Each region also has a color menu initialized to the default color.
 
 Ellipsoid, region appearance, and simplex controls are grouped into collapsible panels. Each render samples exactly 500 reachable simplexes along the active monotonic branch for smoother phase-region boundaries.
 
