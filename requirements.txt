@@ -1,4 +1,9 @@
 dash>=3.0,<5
 numpy>=1.24
 plotly>=6.0,<8
+pyvista>=0.47,<1
 scikit-image>=0.25,<1
+trame>=3.10,<4
+trame-vtk>=2.10,<3
+trame-vuetify>=3.0,<4
+vtk>=9.4,<10

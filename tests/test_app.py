@@ -3,7 +3,7 @@ import unittest
 from dash import no_update
 
 from geometry import generate_simplex_family, make_ellipsoid, nearest_simplex
-from main import (
+from legacy_dash_app import (
     DEFAULTS,
     FAMILY_SIZE,
     REGION_COLOR_IDS,

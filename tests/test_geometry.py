@@ -28,6 +28,17 @@ class GeometryTests(unittest.TestCase):
         np.testing.assert_allclose(ellipsoid.basis.T @ ellipsoid.basis, np.eye(3))
         np.testing.assert_allclose(ellipsoid.center, [0, 0, 4])
 
+    def test_ellipsoid_center_includes_z_axis_intercept(self):
+        ellipsoid = make_ellipsoid(
+            [2, 1, 1],
+            rho=5,
+            theta=90,
+            phi=0,
+            z_offset=2.5,
+        )
+
+        np.testing.assert_allclose(ellipsoid.center, [5, 0, 2.5], atol=1e-12)
+
     def test_ray_intersections_work_for_rotated_shifted_ellipsoid(self):
         ellipsoid = make_ellipsoid([2, 1, 1], rho=5, theta=90, phi=0)
         roots = ray_ellipsoid_intersections(

@@ -75,6 +75,9 @@ class VisualizationTests(unittest.TestCase):
         self.assertIn("Simplex family", trace_names)
         self.assertIn("Selected simplex", trace_names)
         self.assertAlmostEqual(selected.theta, 90)
+        self.assertEqual(figure.data[0].color, "#087830")
+        self.assertEqual(figure.data[0].opacity, 0.42)
+        self.assertTrue(all(trace.opacity == 0.18 for trace in figure.data[1:4]))
         for trace in figure.data[:4]:
             vertices = np.column_stack((trace.x, trace.y, trace.z))
             self.assertLessEqual(
