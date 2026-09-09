@@ -48,8 +48,9 @@ def make_ellipsoid(
     rho: float,
     theta: float,
     phi: float,
+    z_offset: float = 0.0,
 ) -> Ellipsoid:
-    """Construct an ellipsoid whose first axis and center share a direction."""
+    """Construct an ellipsoid along a directed ray from a z-axis intercept."""
     primary = spherical_direction(theta, phi)
     reference = np.array([0.0, 0.0, 1.0])
     if abs(np.dot(primary, reference)) > 0.95:
@@ -61,7 +62,7 @@ def make_ellipsoid(
     tertiary /= np.linalg.norm(tertiary)
 
     return Ellipsoid(
-        center=float(rho) * primary,
+        center=float(rho) * primary + np.array([0.0, 0.0, float(z_offset)]),
         axes=np.maximum(np.asarray(axes, dtype=float), AXIS_EPSILON),
         basis=np.column_stack((primary, secondary, tertiary)),
     )

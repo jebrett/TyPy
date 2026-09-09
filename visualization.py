@@ -16,7 +16,7 @@ from geometry import (
 )
 
 REGIONS = (
-    ("three-phase", "Three-phase coexistence", "#2ca02c"),
+    ("three-phase", "Three-phase coexistence", "#087830"),
     ("segregative", "Segregative two-phase", "#d62728"),
     ("associative-left", "Associative two-phase (left)", "#1f77b4"),
     ("associative-right", "Associative two-phase (right)", "#17becf"),
@@ -126,7 +126,7 @@ def build_figure(
                 j=triangles[:, 1] if len(triangles) else [],
                 k=triangles[:, 2] if len(triangles) else [],
                 color=region_colors.get(key, color),
-                opacity=0.18,
+                opacity=0.42 if key == "three-phase" else 0.18,
                 flatshading=False,
                 lighting={
                     "ambient": 0.7,
